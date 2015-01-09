@@ -167,7 +167,7 @@ public class BMSTool {
 	
 		String [] port_names = jssc.SerialPortList.getPortNames();
 		System.err.println("Ports "+port_names.length);
-		JComboBox<String> ser_name = new JComboBox<String>(port_names);
+		final JComboBox<String> ser_name = new JComboBox<String>(port_names);
 		
 		top_box.add(ser_name);
 		JButton connect = new JButton("Connect");
