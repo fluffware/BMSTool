@@ -3,15 +3,31 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -22,7 +38,10 @@ import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import jssc.SerialPort;
+
+
+import se.ElektroKapsel.BMS.SerialTransceiver;
+import jssc.SerialPortException;
 
 
 
@@ -92,6 +111,7 @@ public class BMSTool {
 	static class App {
 		
 		public JFrame main;
+		public SerialTransceiver transceiver;
 	};
 
 	
@@ -130,6 +150,7 @@ public class BMSTool {
 		}
 	}
 	
+	
 	private static void createMainWindow(final App app) {
 		JFrame win = new JFrame("Log reader");
 		win.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -149,7 +170,24 @@ public class BMSTool {
 		JComboBox<String> ser_name = new JComboBox<String>(port_names);
 		
 		top_box.add(ser_name);
-		
+		JButton connect = new JButton("Connect");
+		connect.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent ev) {
+			
+				try {
+					app.transceiver = new SerialTransceiver((String)ser_name.getSelectedItem());
+				} catch(SerialPortException e) {
+					JOptionPane.showMessageDialog(
+							app.main,
+							"Error while opening serial port: "
+									+ e.getClass().getName() + ": "
+									+ e.getMessage());
+				}
+			}
+		});
+		top_box.add(connect);
 		body.add(top_box);
 		win.setTransferHandler(new FileTransferHandler(app));
 
@@ -164,9 +202,7 @@ public class BMSTool {
 		app.main = win;
 	}
 
-	/**
-	 * @param args
-	 */
+	
 	public static void main(String[] args) {
 
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -175,7 +211,7 @@ public class BMSTool {
 				
 				createMainWindow(app);
 
-				SerialPort ser = new SerialPort("COasf");
+				
 				System.err.println("Running");
 			}
 		});
